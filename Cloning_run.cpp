@@ -103,7 +103,7 @@ int main( int argc,char *argv[]){
 	   fileout<<N_max<<"\n";
            fileout<<"next\n";
            for (int i=0;i<Ntype[0];i++){
-            fileout<<"O"<<"\t"<<masterlattice.pos[0][i][0]<<"\t"<<masterlattice.pos[0][i][1]<<"\t"<<0.1<<"\n";
+            fileout<<"O"<<"\t"<<masterlattice.pos[0][i][0]<<"\t"<<masterlattice.pos[0][i][1]<<"\t"<<0.1<<"\t"<<Pe*cos(masterlattice.theta[0][i])<<"\t"<<Pe*sin(masterlattice.theta[0][i])<<"\n";
            }//Output is written out in Snapshot.....XYZ
 	  }
 	}
@@ -184,7 +184,7 @@ int main( int argc,char *argv[]){
         fileoutclone<<N_max<<"\n";
         fileoutclone<<"Next\n";
         for (int i=0;i<Ntype[0];i++){
-          fileoutclone<<"O"<<"\t"<<mylattice[0].pos[0][i][0]<<"\t"<<mylattice[0].pos[0][i][1]<<"\t"<<0.1<<"\n";
+          fileoutclone<<"O"<<"\t"<<mylattice[0].pos[0][i][0]<<"\t"<<mylattice[0].pos[0][i][1]<<"\t"<<0.1<<"\t"<<Pe*cos(mylattice[0].theta[0][i])<<"\t"<<Pe*sin(mylattice[0].theta[0][i])<<"\n";;
         }//Writeout the data from clone 0 into a movie CloneSnapshot.......XYZ
        }
 
