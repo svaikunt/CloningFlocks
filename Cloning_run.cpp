@@ -87,10 +87,10 @@ int main( int argc,char *argv[]){
 
      //////
     char outputfile[100];
-    sprintf(outputfile,"SnapshotsN%d.N2%d.S%.3f.Lx%.2f.Clone%d.Soft%d.E10.ktracer%.2f.XYZ",N_max,Ntype[0],S,Lx,N_snapshots,soft,ksoft);
+    sprintf(outputfile,"SnapshotsN%d.N2%d.S%.3f.Lx%.2f.Clone%d.Soft%d.E10.ktracer%.2f.lammpstrj",N_max,Ntype[0],S,Lx,N_snapshots,soft,ksoft);
     ofstream fileout;
     fileout.open(outputfile);
-    sprintf(outputfile,"CloneSnapshotsN%d.N2%d.S%.3f.Lx%.2f.Clone%d.Soft%d.E10.ktracer%.2f.XYZ",N_max,Ntype[0],S,Lx,N_snapshots,soft,ksoft);
+    sprintf(outputfile,"NCloneSnapshotsN%d.N2%d.S%.3f.Lx%.2f.Clone%d.Soft%d.E10.ktracer%.2f.lammpstrj",N_max,Ntype[0],S,Lx,N_snapshots,soft,ksoft);
     ofstream fileoutclone;
     fileoutclone.open(outputfile);
     //////
@@ -100,10 +100,17 @@ int main( int argc,char *argv[]){
         for (int j=0;j<10.0/(dt*N_snapshots);j++){//the master lattice is run for 10/(dt*N_snapshots) steps.
           double dump=masterlattice.propogate_dynamics(dt,Pe,0,tau);
 	  if (j%5==0){
+           fileout<<"ITEM: TIMESTEP\n";
+	   fileout<<j<<"\n";
+	   fileout<<"ITEM: NUMBER OF ATOMS\n";
 	   fileout<<N_max<<"\n";
-           fileout<<"next\n";
+	   fileout<<"ITEM: BOX BOUNDS\n";
+	   fileout<<"0\t"<<Lx<<"\n";
+	   fileout<<"0\t"<<Ly<<"\n";
+	   fileout<<"0.1  0.1\n";
+           fileout<<"ITEM: ATOMS id type x y z vx vy vz\n";
            for (int i=0;i<Ntype[0];i++){
-            fileout<<"O"<<"\t"<<masterlattice.pos[0][i][0]<<"\t"<<masterlattice.pos[0][i][1]<<"\t"<<0.1<<"\t"<<Pe*cos(masterlattice.theta[0][i])<<"\t"<<Pe*sin(masterlattice.theta[0][i])<<"\n";
+            fileout<<i<<"\t"<<"0"<<"\t"<<masterlattice.pos[0][i][0]<<"\t"<<masterlattice.pos[0][i][1]<<"\t"<<0.1<<"\t"<<Pe*cos(masterlattice.theta[0][i])<<"\t"<<Pe*sin(masterlattice.theta[0][i])<<"\t"<<"0"<<"\n";
            }//Output is written out in Snapshot.....XYZ
 	  }
 	}
@@ -140,7 +147,8 @@ int main( int argc,char *argv[]){
              y[loopj]+=mylattice[loopj].propogate_dynamics(dt,Pe,teetotaler,tau);//propogate clone.Store value of the trajectory dependent variable \cal E in y[loopi]
 	    }
             tpos[loopj]=mylattice[loopj].pos;//storing clone positions for switching.
-            sumy+=y[loopj];
+            y[loopj]=exp(y[loopj]);//The output from propogate_dynamcis is -S dt \dot{E}. This is added together and then exponentiated. 
+	    sumy+=y[loopj];
          }
          for (int loopj=0;loopj<N_snapshots;loopj++){
             yc[loopj]=(int)(floor(y[loopj]/sumy*N_snapshots+gsl_rng_uniform(r)));//use procedure in PRE paper to generate random numbers according to \cal E 
@@ -181,10 +189,17 @@ int main( int argc,char *argv[]){
         //keep track of growth function.
        }
        if (countdt%10==0){
+        fileoutclone<<"ITEM: TIMESTEP\n";
+        fileoutclone<<countdt<<"\n";
+        fileoutclone<<"ITEM: NUMBER OF ATOMS\n";
         fileoutclone<<N_max<<"\n";
-        fileoutclone<<"Next\n";
+        fileoutclone<<"ITEM: BOX BOUNDS\n";
+        fileoutclone<<"0\t"<<Lx<<"\n";
+        fileoutclone<<"0\t"<<Ly<<"\n";
+        fileoutclone<<"0.1  0.1\n";
+        fileoutclone<<"ITEM: ATOMS id type x y z vx vy vz\n";
         for (int i=0;i<Ntype[0];i++){
-          fileoutclone<<"O"<<"\t"<<mylattice[0].pos[0][i][0]<<"\t"<<mylattice[0].pos[0][i][1]<<"\t"<<0.1<<"\t"<<Pe*cos(mylattice[0].theta[0][i])<<"\t"<<Pe*sin(mylattice[0].theta[0][i])<<"\n";;
+          fileoutclone<<i<<"\t"<<"0"<<"\t"<<mylattice[0].pos[0][i][0]<<"\t"<<mylattice[0].pos[0][i][1]<<"\t"<<0.1<<"\t"<<Pe*cos(mylattice[0].theta[0][i])<<"\t"<<Pe*sin(mylattice[0].theta[0][i])<<"\t"<<"0"<<"\n";
         }//Writeout the data from clone 0 into a movie CloneSnapshot.......XYZ
        }
 

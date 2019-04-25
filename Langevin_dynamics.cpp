@@ -209,7 +209,7 @@ double Langevin_dynamics::propogate_dynamics(double dt,double Pe, double t_c, do
     }
     //cout<<"Leaving loop\n";
     double y1=computey(Pe,t_c,tau);
-    double y2=exp(-dt*S*y1);
+    double y2=-dt*S*y1;
     //cout<<y<<"\n";
     int yc;
     if (fabs(y1*S*dt)>3){
